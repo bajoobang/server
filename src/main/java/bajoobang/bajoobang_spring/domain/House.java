@@ -20,8 +20,6 @@ public class House {
     @OneToMany(mappedBy = "house", fetch = FetchType.LAZY)
     private List<Request> requests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "house", fetch = FetchType.LAZY)
-    private List<Likey> likeys = new ArrayList<>();
 
     // 지역 아이디
     private Long localId;

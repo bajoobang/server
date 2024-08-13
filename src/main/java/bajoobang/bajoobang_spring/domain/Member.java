@@ -41,9 +41,6 @@ public class Member {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
 
-    @OneToMany(mappedBy = "balpoomin", fetch = FetchType.LAZY)
-    private List<Request> requestsAsBalpoomin = new ArrayList<>();
-
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<Alarm> alarms = new ArrayList<>();
 
@@ -55,14 +52,6 @@ public class Member {
 
     public void setRequest(Request request) {
         this.getRequests().add(request);
-    }
-
-    public void setRequestAsBalpoominMember(Request request) {
-        this.getRequestsAsBalpoomin().add(request);
-    }
-
-    public void setAlarm(Alarm alarm) {
-        this.getAlarms().add(alarm);
     }
 
     public void setBaDream(BaDream baDream) {
