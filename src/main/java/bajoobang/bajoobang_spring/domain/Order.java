@@ -30,6 +30,8 @@ public class Order {
 
     private String approvedAt;
 
+    private String reasonForRefund;
+
     public static Order toEntity(Member member, Request request, String tid) {
         return Order.builder()
                 .member(member)

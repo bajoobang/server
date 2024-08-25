@@ -1,21 +1,16 @@
 package bajoobang.bajoobang_spring.service;
 
-import bajoobang.bajoobang_spring.domain.Member;
-import bajoobang.bajoobang_spring.domain.Request;
+import bajoobang.bajoobang_spring.domain.*;
 import bajoobang.bajoobang_spring.dto.RequestDTO;
+import bajoobang.bajoobang_spring.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import bajoobang.bajoobang_spring.domain.House;
-import bajoobang.bajoobang_spring.domain.PlusRequest;
 import bajoobang.bajoobang_spring.dto.BalpoomForm;
 import bajoobang.bajoobang_spring.dto.PlusAnswerForm;
-import bajoobang.bajoobang_spring.repository.HouseRepository;
-import bajoobang.bajoobang_spring.repository.MemberRepository;
-import bajoobang.bajoobang_spring.repository.PlusRequestRepository;
-import bajoobang.bajoobang_spring.repository.RequestRepository;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 
@@ -28,6 +23,8 @@ public class RequestService {
     private final PlusRequestRepository plusRequestRepository;
     private final MemberRepository memberRepository;
     private final HouseRepository houseRepository;
+    private final OrderRepository orderRepository;
+    private final AlarmRepository alarmRepository;
 
     public Request saveRequest(RequestDTO requestDTO, Member member, House house, String address){
         member = memberRepository.findById(member.getId()).orElseThrow(() -> new IllegalArgumentException("Member not found"));
@@ -135,15 +132,51 @@ public class RequestService {
 
     }
 
-    public Request getOneRequest(Long request_id){
-        return requestRepository.findById(request_id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid requestId: " + request_id));
-    }
-
     public List<PlusRequest> getPlusRequestList(Long request_id){
         Request request = requestRepository.findById(request_id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid requestId: " + request_id));
         return plusRequestRepository.findByRequest(request);
     }
 
+    // 구매 취소
+    @Transactional
+    public void withdraw(Member member, Long request_id) throws Exception{
+        Request request = requestRepository.findById(request_id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid requestId: " + request_id));
+        // 요청서를 작성한 멤버가 맞다면
+        if (member.getId().equals(request.getMember().getId())) {
+            // 추가질문 삭제
+            List<PlusRequest> plusRequestList = plusRequestRepository.findByRequest(request);
+            plusRequestRepository.deleteAll(plusRequestList);
+            // 알람 삭제
+            List<Alarm> alarmList = alarmRepository.findByRequest(request);
+            alarmRepository.deleteAll(alarmList);
+            // 결제 정보 삭제
+            Order order = orderRepository.findByRequest(request);
+            orderRepository.delete(order);
+            // 요청서 삭제
+            requestRepository.delete(request);
+        }
+        else {
+            throw new AccessDeniedException("You do not have permission to delete this request.");
+        }
+    }
+
+    // 환불 신청
+    @Transactional
+    public void refund(Member member, Long request_id, String reasonForRefund) throws Exception{
+        Request request = requestRepository.findById(request_id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid requestId: " + request_id));
+        // 요청서를 작성한 멤버가 맞다면
+        if (member.getId().equals(request.getMember().getId())) {
+            // 1. 환불 사유 기입
+            Order order = orderRepository.findByMemberIdAndRequestRequestId(member.getId(), request_id);
+            order.setReasonForRefund(reasonForRefund);
+            orderRepository.save(order);
+            request.setStatus("환불 요청 중");
+        }
+        else {
+            throw new AccessDeniedException("You do not have permission to refund this request.");
+        }
+    }
 }

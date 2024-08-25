@@ -3,6 +3,7 @@ package bajoobang.bajoobang_spring.controller;
 import bajoobang.bajoobang_spring.domain.Member;
 import bajoobang.bajoobang_spring.domain.Request;
 import bajoobang.bajoobang_spring.dto.RequestDTO;
+import bajoobang.bajoobang_spring.pay.response.BaseResponse;
 import bajoobang.bajoobang_spring.repository.HouseRepository;
 import bajoobang.bajoobang_spring.service.RequestService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import bajoobang.bajoobang_spring.domain.House;
 import bajoobang.bajoobang_spring.dto.BalpoomForm;
@@ -103,4 +106,53 @@ public class RequestController {
         BalpoomForm balpoomForm = requestService.getRequestInfo(request_id);
         return balpoomForm;
     }
+
+    // 구매 취소
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<?> withdrawRequest(@RequestParam Long request_id, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            Member member = (Member) session.getAttribute("loginMember");
+            // 구매 취소
+            try {
+                requestService.withdraw(member, request_id);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body("GOOD");
+            }
+            catch(Exception e){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new BaseResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+            }
+        }
+        else {
+            // 로그인 안 한 사용자
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+    }
+
+    // 요청서 환불 신청
+    @PostMapping ("/refund")
+    public ResponseEntity<?> refundRequest(@RequestParam Long request_id,
+                                           HttpServletRequest request,
+                                           @RequestParam String reasonForRefund) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            Member member = (Member) session.getAttribute("loginMember");
+            // 환불 신청
+            try {
+                requestService.refund(member, request_id, reasonForRefund);
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body("GOOD");
+            }
+            catch(Exception e){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new BaseResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+            }
+        }
+        else {
+            // 로그인 안 한 사용자
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+    }
+
 }
