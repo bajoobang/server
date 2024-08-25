@@ -3,6 +3,7 @@ package bajoobang.bajoobang_spring.controller;
 import bajoobang.bajoobang_spring.domain.Member;
 import bajoobang.bajoobang_spring.pay.PayInfoDto;
 import bajoobang.bajoobang_spring.pay.response.BaseResponse;
+import bajoobang.bajoobang_spring.pay.response.PayReadyResDto;
 import bajoobang.bajoobang_spring.service.KakaoPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,13 +24,15 @@ public class KakaoPayController {
     /** 결제 준비 redirect url 받기 --> 상품명과 가격을 같이 보내줘야함 */
     @GetMapping("/ready")
     public ResponseEntity<?> getRedirectUrl(@RequestBody PayInfoDto payInfoDto,
-                                            HttpServletRequest request) {
+                                            HttpServletRequest request,
+                                            HttpServletResponse response) {
         HttpSession session = request.getSession(false);
         if (session != null) {
             Member member = (Member) session.getAttribute("loginMember");
             try {
-                return ResponseEntity.status(HttpStatus.OK)
-                        .body(kakaoPayService.getRedirectUrl(payInfoDto, member));
+                PayReadyResDto payReadyResDto = kakaoPayService.getRedirectUrl(payInfoDto, member);
+                response.sendRedirect(payReadyResDto.getNext_redirect_pc_url());
+                return ResponseEntity.ok("GOOD");
             }
             catch(Exception e){
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
