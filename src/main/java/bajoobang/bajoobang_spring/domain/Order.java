@@ -28,6 +28,8 @@ public class Order {
 
     private String tid;
 
+    private String approvedAt;
+
     public static Order toEntity(Member member, Request request, String tid) {
         return Order.builder()
                 .member(member)

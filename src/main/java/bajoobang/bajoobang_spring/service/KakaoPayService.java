@@ -192,6 +192,19 @@ public class KakaoPayService {
         RestTemplate rt = new RestTemplate();
         PayApproveResDto payApproveResDto = rt.postForObject(payRequest.getUrl(), requestEntity, PayApproveResDto.class);
         log.info("제발 나와라..={}", payApproveResDto);
+
+        Optional.ofNullable(payApproveResDto)
+                .map(PayApproveResDto::getApproved_at)
+                .ifPresentOrElse(
+                        approved_at -> {
+                            order.setApprovedAt(approved_at);
+                            orderRepository.save(order);
+                        },
+                        () -> {
+                            throw new IllegalArgumentException("Approved_at cannot be null.");
+                        }
+                );
+
         return payApproveResDto;
     }
 
