@@ -3,11 +3,14 @@ package bajoobang.bajoobang_spring.controller;
 import bajoobang.bajoobang_spring.domain.Member;
 import bajoobang.bajoobang_spring.domain.Request;
 import bajoobang.bajoobang_spring.dto.RequestDTO;
+import bajoobang.bajoobang_spring.pay.PayInfoDto;
 import bajoobang.bajoobang_spring.pay.response.BaseResponse;
+import bajoobang.bajoobang_spring.pay.response.PayReadyResDto;
 import bajoobang.bajoobang_spring.repository.HouseRepository;
-import bajoobang.bajoobang_spring.service.RequestService;
+import bajoobang.bajoobang_spring.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import bajoobang.bajoobang_spring.domain.House;
 import bajoobang.bajoobang_spring.dto.BalpoomForm;
 import bajoobang.bajoobang_spring.repository.MemberRepository;
-import bajoobang.bajoobang_spring.service.AlarmService;
-import bajoobang.bajoobang_spring.service.HouseService;
-import bajoobang.bajoobang_spring.service.MemberService;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -37,22 +37,23 @@ public class RequestController {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final AlarmService alarmService;
+    private final KakaoPayService kakaoPayService;
 
 
     // 요청서 작성 완료 시.
     @PostMapping("/request-form")
-    public String requestForm(@RequestPart("jsonData") RequestDTO requestDTO,
+    public ResponseEntity<?> requestForm(@RequestPart("jsonData") RequestDTO requestDTO,
                               @RequestPart("date") String date,
                               @RequestPart("price") int price,
                               HttpServletRequest request,
                               @RequestParam Long house_id,
-                              @RequestPart("address") String address) throws IOException {
+                              @RequestPart("address") String address,
+                              HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession(false);
         log.info("---------------");
         log.info("house id: " + house_id);
         if (session != null) {
             ObjectMapper objectMapper = new ObjectMapper();
-            log.info(requestDTO.getHouse_address());
 
             // 세션에서 멤버를 꺼내오기
             Member member = (Member) session.getAttribute("loginMember");
@@ -66,23 +67,32 @@ public class RequestController {
             requestDTO.setPrice(price);
             Request newRequest = requestService.saveRequest(requestDTO, member, house, address);
 
-            log.info("requestDTO.getPrice_request() = {}", requestDTO.getPrice());
-            log.info("newRequest.getPriceRequest() = {}", requestDTO.getDate());
             // 주어진 house의 위도와 경도로부터 가까운 회원 20명 검색
             List<Member> nearbyMembers = memberRepository.findTop20MembersByDistance(house.getLatitude(), house.getLongitude());
             nearbyMembers.forEach(m -> log.info("Member Address: " + m.getAddress()));
-// 여기다
+//  여기다
             List<Member> alarmMembers = memberService.findMembersByTravelTime(member.getId(), nearbyMembers, house.getLatitude(), house.getLongitude());
 
             for(Member mem : alarmMembers){
                 alarmService.saveMemberRequest(mem, newRequest);
             }
-            return "GOOD";
+
+            // 결제 시작
+            try {
+                PayInfoDto payInfoDto = new PayInfoDto();
+                payInfoDto.setRequest_id(newRequest.getRequestId());
+                log.info("{} = request_id", newRequest.getRequestId());
+                payInfoDto.setPrice(price);
+                PayReadyResDto payReadyResDto = kakaoPayService.getRedirectUrl(payInfoDto, member);
+                String kakaoUrl = payReadyResDto.getNext_redirect_pc_url();
+                return ResponseEntity.ok(kakaoUrl);
+            }
+            catch(Exception e){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new BaseResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+            }
         }
-        else {
-            // 로그인 안 한 사용자
-            return "FAIL";
-        }
+        else return ResponseEntity.status(401).body("Unauthorized");
     }
 
     @GetMapping("/request-form")

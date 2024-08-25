@@ -1,8 +1,8 @@
 package bajoobang.bajoobang_spring.pay;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class PayInfoDto {
     private int price;
     private Long request_id;
