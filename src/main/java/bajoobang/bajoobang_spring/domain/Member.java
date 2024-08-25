@@ -29,6 +29,7 @@ public class Member {
     private String address;
     private double latitude;
     private double longitude;
+    private String bankAccount;
 
     @Column(columnDefinition = "float default 0")
     private float star; // 별점
@@ -73,6 +74,7 @@ public class Member {
                 .address(signupForm.getAddress())
                 .latitude(signupForm.getLatitude())
                 .longitude(signupForm.getLongitude())
+                .bankAccount(signupForm.getAccount())
                 .build();
     }
 

@@ -10,4 +10,5 @@ public class SignupForm {
     private String address;
     private double latitude;
     private double longitude;
+    private String account;
 }
