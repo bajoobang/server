@@ -3,6 +3,7 @@ package bajoobang.bajoobang_spring.controller;
 import bajoobang.bajoobang_spring.domain.Member;
 import bajoobang.bajoobang_spring.domain.Request;
 import bajoobang.bajoobang_spring.dto.RequestDTO;
+import bajoobang.bajoobang_spring.dto.RequestIdForm;
 import bajoobang.bajoobang_spring.pay.PayInfoDto;
 import bajoobang.bajoobang_spring.pay.response.BaseResponse;
 import bajoobang.bajoobang_spring.pay.response.PayReadyResDto;
@@ -117,15 +118,38 @@ public class RequestController {
         return balpoomForm;
     }
 
+    // 구매 확정
+    @PatchMapping ("/confirm")
+    public ResponseEntity<?> confirmRequest(@RequestBody RequestIdForm requestIdForm, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            Member member = (Member) session.getAttribute("loginMember");
+            // 구매 확정
+            try {
+                requestService.confirm(member,requestIdForm.getRequest_id());
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body("GOOD");
+            }
+            catch(Exception e){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new BaseResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+            }
+        }
+        else {
+            // 로그인 안 한 사용자
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+    }
+
     // 구매 취소
     @DeleteMapping("/withdraw")
-    public ResponseEntity<?> withdrawRequest(@RequestParam Long request_id, HttpServletRequest request) {
+    public ResponseEntity<?> withdrawRequest(@RequestBody RequestIdForm requestIdForm, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
             Member member = (Member) session.getAttribute("loginMember");
             // 구매 취소
             try {
-                requestService.withdraw(member, request_id);
+                requestService.withdraw(member,requestIdForm.getRequest_id());
                 return ResponseEntity.status(HttpStatus.OK)
                         .body("GOOD");
             }

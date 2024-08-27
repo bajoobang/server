@@ -138,6 +138,21 @@ public class RequestService {
         return plusRequestRepository.findByRequest(request);
     }
 
+    // 구매 확정
+    @Transactional
+    public void confirm(Member member, Long request_id) throws Exception{
+        Request request = requestRepository.findById(request_id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid requestId: " + request_id));
+        // 요청서를 작성한 멤버가 맞다면
+        if (member.getId().equals(request.getMember().getId())) {
+            request.setStatus("구매 확정");
+            requestRepository.save(request);
+        }
+        else {
+            throw new AccessDeniedException("You do not have permission to confirm this request.");
+        }
+    }
+
     // 구매 취소
     @Transactional
     public void withdraw(Member member, Long request_id) throws Exception{
@@ -173,7 +188,7 @@ public class RequestService {
             Order order = orderRepository.findByMemberIdAndRequestRequestId(member.getId(), request_id);
             order.setReasonForRefund(reasonForRefund);
             orderRepository.save(order);
-            request.setStatus("환불 요청 중");
+            request.setStatus("환불 중");
         }
         else {
             throw new AccessDeniedException("You do not have permission to refund this request.");

@@ -42,7 +42,7 @@ public class FootworkService {
             else {
                 // 매칭 성공 (발품인 == member)
                 if (request.getBalpoomin().getId().equals(member.getId())) {
-                    // 작성 완료 혹은 매칭완료
+                    // 작성 완료 혹은 매칭 완료 혹은 구매 확정 혹은 환불 중 혹은 환불 완료
                     footwork.put("state", request.getStatus());
                     footwork.put("worker_id", request.getBalpoomin().getId());
                 }
