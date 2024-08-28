@@ -11,7 +11,6 @@ import bajoobang.bajoobang_spring.repository.HouseRepository;
 import bajoobang.bajoobang_spring.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,8 +47,7 @@ public class RequestController {
                               @RequestPart("price") int price,
                               HttpServletRequest request,
                               @RequestParam Long house_id,
-                              @RequestPart("address") String address,
-                              HttpServletResponse response) throws IOException {
+                              @RequestPart("address") String address) {
         HttpSession session = request.getSession(false);
         log.info("---------------");
         log.info("house id: " + house_id);
@@ -68,24 +66,24 @@ public class RequestController {
             requestDTO.setPrice(price);
             Request newRequest = requestService.saveRequest(requestDTO, member, house, address);
 
-            // 주어진 house의 위도와 경도로부터 가까운 회원 20명 검색
-            List<Member> nearbyMembers = memberRepository.findTop20MembersByDistance(house.getLatitude(), house.getLongitude());
-            nearbyMembers.forEach(m -> log.info("Member Address: " + m.getAddress()));
-//  여기다
-            List<Member> alarmMembers = memberService.findMembersByTravelTime(member.getId(), nearbyMembers, house.getLatitude(), house.getLongitude());
-
-            for(Member mem : alarmMembers){
-                alarmService.saveMemberRequest(mem, newRequest);
-            }
-
-            // 결제 시작
             try {
+                // 결제 시작
                 PayInfoDto payInfoDto = new PayInfoDto();
                 payInfoDto.setRequest_id(newRequest.getRequestId());
                 log.info("{} = request_id", newRequest.getRequestId());
                 payInfoDto.setPrice(price);
                 PayReadyResDto payReadyResDto = kakaoPayService.getRedirectUrl(payInfoDto, member);
                 String kakaoUrl = payReadyResDto.getNext_redirect_pc_url();
+
+                // 주어진 house의 위도와 경도로부터 가까운 회원 20명 검색
+                List<Member> nearbyMembers = memberRepository.findTop20MembersByDistance(house.getLatitude(), house.getLongitude());
+                nearbyMembers.forEach(m -> log.info("Member Address: " + m.getAddress()));
+//  여기다
+                List<Member> alarmMembers = memberService.findMembersByTravelTime(member.getId(), nearbyMembers, house.getLatitude(), house.getLongitude());
+
+                for(Member mem : alarmMembers){
+                    alarmService.saveMemberRequest(mem, newRequest);
+                }
                 return ResponseEntity.ok(kakaoUrl);
             }
             catch(Exception e){

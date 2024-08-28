@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import bajoobang.bajoobang_spring.pay.response.PayApproveResDto;
 
+import java.io.IOException;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/payment")
@@ -45,23 +47,19 @@ public class KakaoPayController {
      * 결제 성공 pid 를  받기 위해 request를 받고 pgToken은 rediret url에 뒤에 붙어오는걸 떼서 쓰기 위함
      */
     @GetMapping("/success/{orderId}") // {id+request_id}
-    public String afterGetRedirectUrl(HttpServletResponse response,
+    public void afterGetRedirectUrl(HttpServletResponse response,
                                       @PathVariable("orderId")String orderId,
-                                      @RequestParam("pg_token") String pgToken) {
+                                      @RequestParam("pg_token") String pgToken) throws IOException {
         try {
             PayApproveResDto kakaoApprove = kakaoPayService.getApprove(pgToken, orderId);
 
-//            return ResponseEntity.status(HttpStatus.OK)
-//                    .body(kakaoApprove);
-            // 일단 결제 완료되면 마이페이지로 리다이렉트
-            //로컬
-//            response.sendRedirect("http://35.216.29.229:3000/member");
-            // 배포
-            response.sendRedirect("http://35.216.29.229:3000/member");
-            return "GOOD";
-        }
-        catch(Exception e){
-            return "FAIL";
+            // 성공 시 클라이언트 창을 닫는 JavaScript 코드를 응답으로 보냅니다.
+            response.setContentType("text/html; charset=UTF-8");
+            response.getWriter().println("<script>alert('결제가 완료되었습니다.'); window.close();</script>");
+        } catch (Exception e) {
+            // 실패 시에도 클라이언트 창을 닫는 JavaScript 코드를 응답으로 보냅니다.
+            response.setContentType("text/html; charset=UTF-8");
+            response.getWriter().println("<script>alert('결제 처리에 실패하였습니다.'); window.close();</script>");
         }
     }
 
