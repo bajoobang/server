@@ -140,7 +140,7 @@ public class RequestController {
     }
 
     // 구매 취소
-    @DeleteMapping("/withdraw")
+    @PatchMapping("/withdraw")
     public ResponseEntity<?> withdrawRequest(@RequestBody RequestIdForm requestIdForm, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
