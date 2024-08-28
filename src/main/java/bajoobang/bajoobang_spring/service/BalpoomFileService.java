@@ -55,7 +55,7 @@ public class BalpoomFileService {
         // /Users/woosungchoi/Desktop/mypage/2024-1-OSSP2-team-6-BaJooBang/BaJooBang/src/main/frontend/public
 
         // 서버에 저장할 진짜 경로
-//        return Paths.get("/home/chldntjd49/chldntjd49/images/").resolve(filename).normalize();
+//        return Paths.get("/home/chldntjd49/bajoobang/images/").resolve(filename).normalize();
         return Paths.get("/Users/woosungchoi/study/file").resolve(filename).normalize();
 
     }

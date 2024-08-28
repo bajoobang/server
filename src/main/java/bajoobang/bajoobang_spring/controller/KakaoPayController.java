@@ -54,7 +54,10 @@ public class KakaoPayController {
 //            return ResponseEntity.status(HttpStatus.OK)
 //                    .body(kakaoApprove);
             // 일단 결제 완료되면 마이페이지로 리다이렉트
-            response.sendRedirect("http://localhost:3000/member");
+            //로컬
+//            response.sendRedirect("http://35.216.29.229:3000/member");
+            // 배포
+            response.sendRedirect("http://35.216.29.229:3000/member");
             return "GOOD";
         }
         catch(Exception e){
