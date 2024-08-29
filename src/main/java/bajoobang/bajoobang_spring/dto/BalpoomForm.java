@@ -28,9 +28,9 @@ public class BalpoomForm {
     private String status;
 
     // 수압
-    private String powerWater = null;
-    private String powerWash = null;
-    private String powerShower = null;
+    private Integer powerWater = null;
+    private Integer powerWash = null;
+    private Integer powerShower = null;
 
     // 온수 시간
     private String timeWater1 = null;
@@ -44,11 +44,11 @@ public class BalpoomForm {
     private String lighting = null;
 
     // 곰팡이
-    private String moldLiving = null;
-    private String moldRest = null;
-    private String moldVeranda = null;
-    private String moldShoes = null;
-    private String moldWindow = null;
+    private Boolean moldLiving = null;
+    private Boolean moldRest = null;
+    private Boolean moldVeranda = null;
+    private Boolean moldShoes = null;
+    private Boolean moldWindow = null;
 
     public static BalpoomForm toDTO(List<PlusRequest> plusRequests, Request requestInfo){
         return BalpoomForm.builder()

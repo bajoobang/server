@@ -82,24 +82,21 @@ public class RequestService {
 
         Random random = new Random();
 
+        int powerShower = random.nextInt(3) + 1;
+        int powerWater = random.nextInt(3) + 1;
+        int powerWash = random.nextInt(3) + 1;
 
-
-
+        boolean moldLiving = random.nextBoolean();
+        boolean moldRest = random.nextBoolean();
+        boolean moldVeranda = random.nextBoolean();
+        boolean moldShoes = random.nextBoolean();
+        boolean moldWindow = random.nextBoolean();
 
         String[] optionsL = {"good", "cover", "sun back"};
         String lighting = optionsL[random.nextInt(optionsL.length)];
 
         String[] optionM = {"mold", "non"};
-        String moldLiving = optionM[random.nextInt(optionM.length)];
-        String moldRest = optionM[random.nextInt(optionM.length)];
-        String moldVeranda = optionM[random.nextInt(optionM.length)];
-        String moldShoes = optionM[random.nextInt(optionM.length)];
-        String moldWindow = optionM[random.nextInt(optionM.length)];
 
-        String[] optionP = {"lower", "middle", "upper"};
-        String powerShower = optionP[random.nextInt(optionP.length)];
-        String powerWater = optionP[random.nextInt(optionP.length)];
-        String powerWash = optionP[random.nextInt(optionP.length)];
 
         request.setLighting(lighting);
         request.setPowerShower(powerShower);
