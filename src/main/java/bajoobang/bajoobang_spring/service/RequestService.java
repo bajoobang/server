@@ -92,8 +92,11 @@ public class RequestService {
         boolean moldShoes = random.nextBoolean();
         boolean moldWindow = random.nextBoolean();
 
-        String[] options = {"좋음", "건물에 가림", "해와 역방향", "기타"};
-        String lighting = options[random.nextInt(options.length)];
+        String[] optionsL = {"good", "cover", "sun back"};
+        String lighting = optionsL[random.nextInt(optionsL.length)];
+
+        String[] optionM = {"mold", "non"};
+
 
         request.setLighting(lighting);
         request.setPowerShower(powerShower);
