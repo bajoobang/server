@@ -35,9 +35,9 @@ public class Request {
 //    private boolean complete = false;
 
     // 수압
-    private Integer powerWater = null;
-    private Integer powerWash = null;
-    private Integer powerShower = null;
+    private String powerWater = null;
+    private String powerWash = null;
+    private String powerShower = null;
 
     // 온수 시간
     private String timeWater1 = null;
@@ -53,11 +53,11 @@ public class Request {
     private String lighting = null;
 
     // 곰팡이
-    private Boolean moldLiving = null;
-    private Boolean moldRest = null;
-    private Boolean moldVeranda = null;
-    private Boolean moldShoes = null;
-    private Boolean moldWindow = null;
+    private String moldLiving = null;
+    private String moldRest = null;
+    private String moldVeranda = null;
+    private String moldShoes = null;
+    private String moldWindow = null;
 
     @OneToMany(mappedBy = "request")
     @JsonManagedReference
