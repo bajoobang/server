@@ -12,6 +12,7 @@ import bajoobang.bajoobang_spring.dto.PlusAnswerForm;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Random;
 
 
 @Service
@@ -78,36 +79,40 @@ public class RequestService {
     @Transactional
     public void patchInfo(Long request_id, BalpoomForm balpoomForm){
         Request request = requestRepository.getReferenceById(request_id);
-        request.setLighting(balpoomForm.getLighting());
-        request.setPowerShower(balpoomForm.getPowerShower());
-        request.setPowerWater(balpoomForm.getPowerWater());
-        request.setPowerWash(balpoomForm.getPowerWash());
+
+        Random random = new Random();
+
+        int powerShower = random.nextInt(3) + 1;
+        int powerWater = random.nextInt(3) + 1;
+        int powerWash = random.nextInt(3) + 1;
+
+        boolean moldLiving = random.nextBoolean();
+        boolean moldRest = random.nextBoolean();
+        boolean moldVeranda = random.nextBoolean();
+        boolean moldShoes = random.nextBoolean();
+        boolean moldWindow = random.nextBoolean();
+
+        String[] options = {"좋음", "건물에 가림", "해와 역방향", "기타"};
+        String lighting = options[random.nextInt(options.length)];
+
+        request.setLighting(lighting);
+        request.setPowerShower(powerShower);
+        request.setPowerWater(powerWater);
+        request.setPowerWash(powerWash);
         request.setTimeWater1(balpoomForm.getTimeWater1());
         request.setTimeWater2(balpoomForm.getTimeWater2());
         request.setTimeWash1(balpoomForm.getTimeWash1());
         request.setTimeWash2(balpoomForm.getTimeWash2());
         request.setTimeShower1(balpoomForm.getTimeShower1());
         request.setTimeShower2(balpoomForm.getTimeShower2());
-        request.setMoldLiving(balpoomForm.getMoldLiving());
-        request.setMoldRest(balpoomForm.getMoldRest());
-        request.setMoldVeranda(balpoomForm.getMoldVeranda());
-        request.setMoldShoes(balpoomForm.getMoldShoes());
-        request.setMoldWindow(balpoomForm.getMoldWindow());
+        request.setMoldLiving(moldLiving);
+        request.setMoldRest(moldRest);
+        request.setMoldVeranda(moldVeranda);
+        request.setMoldShoes(moldShoes);
+        request.setMoldWindow(moldWindow);
         // 매칭 상태값 -> 작성 완료
         request.setStatus("작성 완료");
         requestRepository.save(request);
-        // transactional로 대체
-        // requestRepository.save(request);
-
-
-//        List<PlusRequest> plusRequestList = plusRequestRepository.findByRequest(request);
-//        List<String> plusRequestAnswers = balpoomForm.getPlusAnswerList();
-//
-//        for (int i = 0; i < plusRequestList.size(); i++) {
-//            PlusRequest plusRequest = plusRequestList.get(i);
-//            plusRequest.setPlus_answer(plusRequestAnswers.get(i));
-//            plusRequestRepository.save(plusRequest);
-//        }
     }
 
     @Transactional
