@@ -92,7 +92,7 @@ public class RequestService {
         boolean moldShoes = random.nextBoolean();
         boolean moldWindow = random.nextBoolean();
 
-        String[] options = {"좋음", "건물에 가림", "해와 역방향", "기타"};
+        String[] options = {"good", "cover", "sun back"};
         String lighting = options[random.nextInt(options.length)];
 
         request.setLighting(lighting);
