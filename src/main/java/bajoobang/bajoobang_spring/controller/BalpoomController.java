@@ -85,6 +85,9 @@ public class BalpoomController {
     @PatchMapping(path = "/balpoom-form")
     public void testImage(@RequestPart("request_id") Long request_id,
                           @RequestPart("files") List<MultipartFile> files,
+                          @RequestPart("waterImages") List<MultipartFile> waterFiles,
+                          @RequestPart("lightImage") List<MultipartFile> lightFile,
+                          @RequestPart("moldImages") List<MultipartFile> moldFiles,
                           @RequestPart("jsonData") BalpoomForm balpoomForm,
                           @RequestPart("plusAnswerData") PlusAnswerForm plusAnswerForm) throws IOException {
         // plusAnswerForm.answers = ["답변1","답변2",...,"답변n"] -> plus request 테이블
