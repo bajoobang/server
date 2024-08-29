@@ -2,6 +2,7 @@ package bajoobang.bajoobang_spring.controller;
 
 import bajoobang.bajoobang_spring.domain.Member;
 import bajoobang.bajoobang_spring.domain.Request;
+import bajoobang.bajoobang_spring.dto.RefundForm;
 import bajoobang.bajoobang_spring.dto.RequestDTO;
 import bajoobang.bajoobang_spring.dto.RequestIdForm;
 import bajoobang.bajoobang_spring.pay.PayInfoDto;
@@ -164,15 +165,14 @@ public class RequestController {
 
     // 요청서 환불 신청
     @PostMapping ("/refund")
-    public ResponseEntity<?> refundRequest(@RequestBody RequestIdForm requestIdForm,
-                                           HttpServletRequest request,
-                                           @RequestParam String reasonForRefund) {
+    public ResponseEntity<?> refundRequest(@RequestBody RefundForm refundForm,
+                                           HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
             Member member = (Member) session.getAttribute("loginMember");
             // 환불 신청
             try {
-                requestService.refund(member, requestIdForm.getRequest_id(), reasonForRefund);
+                requestService.refund(member, refundForm.getRequest_id(), refundForm.getReasonForRefund());
                 return ResponseEntity.status(HttpStatus.OK)
                         .body("GOOD");
             }
