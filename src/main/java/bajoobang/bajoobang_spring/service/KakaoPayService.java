@@ -68,16 +68,16 @@ public class KakaoPayService {
         // 나온 결과로 이동할 url을 설정해 주는 것입니다.
 
         // 로컬
-//        map.put("approval_url", "http://localhost:8000/payment/success"+"/"+orderId); // 성공 시 redirect url
-//        // 뒤에 경로 변수로 멤버id값을 추가함
-//        map.put("cancel_url", "http://localhost:8000/payment/cancel"); // 취소 시 redirect url
-//        map.put("fail_url", "http://localhost:8000/payment/fail"); // 실패 시 redirect url
+        map.put("approval_url", "http://localhost:8000/payment/success"+"/"+orderId); // 성공 시 redirect url
+        // 뒤에 경로 변수로 멤버id값을 추가함
+        map.put("cancel_url", "http://localhost:8000/payment/cancel"); // 취소 시 redirect url
+        map.put("fail_url", "http://localhost:8000/payment/fail"); // 실패 시 redirect url
 
         // 배포
-        map.put("approval_url", "http://35.216.29.229:8000/payment/success"+"/"+orderId); // 성공 시 redirect url
-        // 뒤에 경로 변수로 멤버id값을 추가함
-        map.put("cancel_url", "http://35.216.29.229:8000/payment/cancel"); // 취소 시 redirect url
-        map.put("fail_url", "http://35.216.29.229:8000/payment/fail"); // 실패 시 redirect url
+//        map.put("approval_url", "http://35.216.29.229:8000/payment/success"+"/"+orderId); // 성공 시 redirect url
+//        // 뒤에 경로 변수로 멤버id값을 추가함
+//        map.put("cancel_url", "http://35.216.29.229:8000/payment/cancel"); // 취소 시 redirect url
+//        map.put("fail_url", "http://35.216.29.229:8000/payment/fail"); // 실패 시 redirect url
 
         return new PayRequest("https://open-api.kakaopay.com/online/v1/payment/ready",map);
     }
