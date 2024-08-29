@@ -164,7 +164,7 @@ public class RequestController {
 
     // 요청서 환불 신청
     @PostMapping ("/refund")
-    public ResponseEntity<?> refundRequest(@RequestParam Long request_id,
+    public ResponseEntity<?> refundRequest(@RequestBody RequestIdForm requestIdForm,
                                            HttpServletRequest request,
                                            @RequestParam String reasonForRefund) {
         HttpSession session = request.getSession(false);
@@ -172,7 +172,7 @@ public class RequestController {
             Member member = (Member) session.getAttribute("loginMember");
             // 환불 신청
             try {
-                requestService.refund(member, request_id, reasonForRefund);
+                requestService.refund(member, requestIdForm.getRequest_id(), reasonForRefund);
                 return ResponseEntity.status(HttpStatus.OK)
                         .body("GOOD");
             }
